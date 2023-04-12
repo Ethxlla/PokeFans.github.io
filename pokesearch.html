@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+ 
+  <title>Poké Fans Search Page</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="pokesearch.css">
+  </head>
+
+  <body>
+
+  <div class="container">
+  <img src="images/PFIcon.png" alt="Pokefans logo" width="400px">
+  <div class="button-container">
+    <button onclick="window.location.href='login.html'">Login</button>
+    <button onclick="window.location.href='signup.html'">Sign Up</button>
+    <button onclick="window.location.href='profile.html'">Profile</button>
+    <button onclick="window.location.href='pokedex.html'">Pokedex</button>
+    <button onclick="window.location.href='index.html'">Home</button>
+  </div>
+</div>
+    </section>
+
+    
+  <div class="search-container">
+  <label for="pokemon-name">Search by Name:</label>
+  <input type="text" id="pokemon-name" name="pokemon-name">
+  <button type="button" onclick="searchPokemon()">Search</button>
+</div>
+
+<div class="result-container">
+  <div id="result"></div>
+</div>
+
+<script>
+  async function searchPokemon() {
+    const nameInput = document.querySelector('#pokemon-name');
+    const pokemonName = nameInput.value.trim().toLowerCase();
+
+    // api needs to genenerate stats for the pokemon searched
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+      const pokemonData = await response.json();
+
+      const resultDiv = document.querySelector('#result');
+      let statsHTML = '';
+      for (const stat of pokemonData.stats) {
+        statsHTML += `<p>${stat.stat.name}: ${stat.base_stat}</p>`;
+      }
+      resultDiv.innerHTML = `
+        <h2>${pokemonData.name}</h2>
+        <img src="${pokemonData.sprites.front_default}" id="pokemon-image">
+        ${statsHTML}
+      `;
+
+      // Add event listener to the image to trigger shake animation
+      const pokemonImage = document.querySelector('#pokemon-image');
+      pokemonImage.addEventListener('click', () => {
+        pokemonImage.classList.add('shake');
+        setTimeout(() => {
+          pokemonImage.classList.remove('shake');
+        }, 500);
+      });
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      const resultDiv = document.querySelector('#result');
+      resultDiv.innerText = `Oh no! I dont think "${pokemonName}" exists.`;
+    }
+  }
+</script>
+
+
+    </body>
+</html>
+
+

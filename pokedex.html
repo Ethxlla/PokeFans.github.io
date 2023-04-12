@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pokedex</title>
+ 
+  <link rel="stylesheet" type="text/css" href="pokedex.css">
+
+</head>
+
+<body>
+
+   <div class="container">
+  <img src="images/PFIcon.png" alt="Pokefans logo" width="400px">
+  <div class="button-container">
+    <button onclick="window.location.href='login.html'">Login</button>
+    <button onclick="window.location.href='signup.html'">Sign Up</button>
+    <button onclick="window.location.href='profile.html'">Profile</button>
+    <button onclick="window.location.href='index.html'">Home</button>
+  </div>
+</div>
+
+  
+  <main>
+
+    <!-- SEARCH -->
+  
+    <div class="search-button-container">
+   <button class="search-btn" onclick="window.location.href='pokesearch.html'">Search By Name </button>
+    </div>
+
+
+    <!--code for the drop down menu-->
+    <label for="pokemon-type">Filter by Type:</label>
+    <select id="pokemon-type" onchange="filterByType()"> </select>
+
+    <div id="error-message" style="display: none;"> Whoops! There aren't any pokemon with this type in the database.</div>
+
+ 
+    <table class="card">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Weight</th>
+          <th>Image</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="result">
+      </tbody>
+    </table>
+
+    <nav class="pagination">
+      <button onclick="previousPage()">Previous</button>
+      <span id="currentPage">1</span>
+      <button onclick="nextPage()">Next</button>
+    </nav>
+  </main>
+
+  <script>
+const PAGE_SIZE = 10;
+let state = [];
+let currentPage = 1;
+
+async function getData() {
+  try {
+    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100');
+    const data = await response.json();
+    state = data.results;
+  } catch (error) {
+    console.error('Failed to fetch data:', error);
+    // handle the error gracefully, e.g. return a default value or re-throw the error
+  }
+}
+
+async function drawTable(records) {
+  let html = '';
+  let result = document.querySelector('#result');
+
+  let start = (currentPage - 1) * PAGE_SIZE;
+  let end = start + PAGE_SIZE;
+
+  for (let i = start; i < end && i < records.length; i++) {
+    let rec = records[i];
+    let pokemonResponse = await fetch(rec.url);
+    let pokemonData = await pokemonResponse.json();
+    
+    let type = '';
+    if (pokemonData.types.length > 0) {
+      type = pokemonData.types[0].type.name;
+    }
+
+    html += `<tr>
+      <td>${pokemonData.name}</td>
+      <td>${pokemonData.weight}</td>
+      <td><img src="${pokemonData.sprites.front_default}"></td>
+      <td>${type}</td>
+    </tr>`;
+  }
+
+  result.innerHTML = html;
+}
+
+async function showAllPokemon() {
+  await getData();
+  drawTable(state);
+}
+
+showAllPokemon();
+
+  function nextPage() {
+    let totalRecords = state.length;
+    let totalPages = Math.ceil(totalRecords / PAGE_SIZE);
+    
+    if (currentPage < totalPages) {
+      currentPage++;
+      let selectedType = select.value;
+      if (selectedType === 'all') {
+        drawTable(state);
+      } else {
+        let filteredData = state.filter((rec) => {
+          let hasMatch = false;
+          state.forEach(async (rec) => {
+            let pokemonResponse = await fetch(rec.url);
+            let pokemonData = await pokemonResponse.json();
+            let type = '';
+            if (pokemonData.types.length > 0) {
+              type = pokemonData.types[0].type.name;
+            }
+            if (type === selectedType) {
+              hasMatch = true;
+            }
+          });
+          return hasMatch;
+        });
+        if (!filteredData.length) {
+          result.innerHTML = '';
+          return;
+        } else {
+          drawTable(filteredData);
+        }
+      }
+      updatePagination();
+    } else if (currentPage === totalPages) {
+      currentPage = totalPages - 1;
+      let selectedType = select.value;
+      if (selectedType === 'all') {
+        drawTable(state);
+      } else {
+        let filteredData = state.filter((rec) => {
+          let hasMatch = false;
+          state.forEach(async (rec) => {
+            let pokemonResponse = await fetch(rec.url);
+            let pokemonData = await pokemonResponse.json();
+            let type = '';
+            if (pokemonData.types.length > 0) {
+              type = pokemonData.types[0].type.name;
+            }
+            if (type === selectedType) {
+              hasMatch = true;
+            }
+          });
+          return hasMatch;
+        });
+        if (!filteredData.length) {
+          result.innerHTML = '';
+          return;
+        } else {
+          drawTable(filteredData);
+        }
+      }
+      updatePagination();
+    }
+  }
+  
+  function previousPage() {
+    if (currentPage === 1) {
+      return;
+    }
+    currentPage--;
+    let selectedType = select.value;
+    if (selectedType === 'all') {
+      drawTable(state);
+    } else {
+      let filteredData = state.filter((rec) => {
+        let hasMatch = false;
+        state.forEach(async (rec) => {
+          let pokemonResponse = await fetch(rec.url);
+          let pokemonData = await pokemonResponse.json();
+          let type = '';
+          if (pokemonData.types.length > 0) {
+            type = pokemonData.types[0].type.name;
+          }
+          if (type === selectedType) {
+            hasMatch = true;
+          }
+        });
+        return hasMatch;
+      });
+      if (!filteredData.length) {
+        result.innerHTML = '';
+        return;
+      } else {
+        drawTable(filteredData);
+      }
+    }
+    updatePagination();
+  }
+  
+  
+  function updatePagination() {
+    let currentPageElement = document.querySelector('#currentPage');
+    currentPageElement.innerText = currentPage;
+  }
+  
+  // populate the drop-down menu with types automatically 
+  const select = document.querySelector('#pokemon-type');
+  
+async function populateTypes() {
+  const response = await fetch('https://pokeapi.co/api/v2/type/');
+  const data = await response.json();
+  const types = data.results;
+
+   // add an option for all types
+  const allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.text = 'All Types';
+  select.appendChild(allOption);
+
+  
+  for (let i = 0; i < types.length; i++) {
+    const option = document.createElement('option');
+    option.value = types[i].name;
+    option.text = types[i].name;
+    select.appendChild(option);
+  }
+}
+
+populateTypes();
+
+    async function filterByType() {
+  let selectedType = select.value;
+  let filteredData = [];
+  
+  if (selectedType === 'all') {
+    drawTable(state);
+    return;
+  }
+
+  if (selectedType !== '') {
+    let hasMatch = false;
+    for (let i = 0; i < state.length; i++) {
+      let rec = state[i];
+      let pokemonResponse = await fetch(rec.url);
+      let pokemonData = await pokemonResponse.json();
+      let type = '';
+      if (pokemonData.types.length > 0) {
+        type = pokemonData.types[0].type.name;
+      }
+      if (type === selectedType) {
+        filteredData.push(rec);
+        hasMatch = true;
+      }
+    }
+    if (!hasMatch) {
+      document.querySelector('#error-message').style.display = 'block';
+    } else {
+      document.querySelector('#error-message').style.display = 'none';
+    }
+  } else {
+    filteredData = state;
+  }
+  currentPage = 1;
+  drawTable(filteredData);
+  updatePagination();
+}
+
+
+</script>
+
+
+</body>
+
+</html>

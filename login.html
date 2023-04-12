@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+   <head>
+    <title>PokéFans Login</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="login.css">  
+  </head>
+  <body>
+
+    <!-- NAV BAR: LOGO AND BUTTONS -->
+      <div class="container">
+  <img src="images/PFIcon.png" alt="Pokefans logo" width="400px">
+  <div class="button-container">
+  <!--  <button onclick="window.location.href='login.html'">Login</button> -->
+    <button onclick="window.location.href='signup.html'">Sign Up</button>
+    <button onclick="window.location.href='profile.html'">Profile</button>
+    <button onclick="window.location.href='pokedex.html'">Pokedex</button>
+    <button onclick="window.location.href='index.html'">Home</button>
+  </div>
+</div>
+
+  
+    <form id="login-form">
+		<div class="form-container">
+      <img src="images/pokegroupshot.png" alt= "Pokemon group shot" width ="200px" height = "100px">
+			<h1>Login </h1>
+			<hr>
+
+		<label for="username">Username:</label>
+    <br>
+    <input type="text" id="username" name="username" placeholder="Enter your username">
+    <br>
+    <br>
+    <label for="password">Password:</label>
+    <br>
+    <input type="password" id="password" name="password" placeholder="Enter your password">
+    <br>
+    <hr>
+    <button type="submit">Log in</button>
+      
+		</div>
+	</form>
+
+
+    <script>
+    
+
+ 
+//  event listener will be added to the login form only after the DOM has been fully loaded. 
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.querySelector("#login-form");
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    
+    
+  // Get the username and password input fields
+  const usernameInput = loginForm.querySelector("#username");
+  const passwordInput = loginForm.querySelector("#password");
+
+  // Get the user data for the entered username from localStorage
+  const userDataString = localStorage.getItem(usernameInput.value);
+  if (!userDataString) {
+    alert("User not found. Please sign up first.");
+    return;
+  }
+  const userData = JSON.parse(userDataString);
+
+  // Check if the entered password matches the user's password
+  if (userData.password === passwordInput.value) {
+    // If the password is correct, show a welcome message
+    const welcomeMessage = `Welcome, ${userData.fullname}!`;
+    alert(welcomeMessage);
+
+    // Create the user profile object if it doesn't exist
+    if (!userData.userProfile) {
+      userData.userProfile = createUserProfile(userData.fullname, userData.email);
+      localStorage.setItem(usernameInput.value, JSON.stringify(userData));
+    }
+
+    // Store the logged-in user's username in session storage
+    sessionStorage.setItem("loggedInUser", userData.username);
+
+    // Redirect the user to profile.html
+    window.location.href = "profile.html";
+
+  } else {
+    // If the password is incorrect, show an error message
+    alert("Incorrect username or password. Please try again.");
+  }
+
+  // Reset the form fields
+  loginForm.reset();
+  });
+});
+
+    </script>
+  </body>
+</html>
+
+
+
+

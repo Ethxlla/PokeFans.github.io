@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>User Profile</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="profile.css">
+</head>
+<body>
+
+<!-- NAV BAR: LOGO AND BUTTONS -->
+   <div class="container">
+  <img src="images/PFIcon.png" alt="Pokefans logo" width="400px">
+  <div class="button-container">
+    <button onclick="window.location.href='pokedex.html'">Pokedex</button>
+    <button onclick="window.location.href='index.html'"> Home</button>
+  </div>
+</div>
+
+<main>
+  <div class="profile-container">
+    <h1>Welcome, <span id="full-name"></span>!</h1>
+    <img id="profile-pic" src="images/default.png" alt="Default Profile Picture">
+    <form id="profile-form">
+
+      <p>Trainer Name: <input type="text" id="name-input" value="" disabled><button class="button2" type="button" id="edit-name" onclick="toggleEditMode('name-input', 'edit-name')">Edit</button></p>
+
+      <p>Trainer Rank: <input type="text" id="rank-input" value="" disabled><button type="button" id="edit-rank" onclick="toggleEditMode('rank-input', 'edit-rank')">Edit</button></p>
+
+      <p>Pokemons Caught: <input type="number" id="pokemons-input" value="" disabled><button type="button" id="edit-pokemons" onclick="toggleEditMode('pokemons-input', 'edit-pokemons')">Edit</button></p>
+
+      <p>Battles Won: <input type="number" id="battles-input" value="" disabled><button type="button" id="edit-battles" onclick="toggleEditMode('battles-input', 'edit-battles')">Edit</button></p>
+
+      <button class="save-button" type="button" id="save-button" onclick="saveChanges()" enable>Save Changes</button>
+      <button class="cancel-button" type="button" id="cancel-button" onclick="cancelChanges()" disabled>Cancel</button>
+      <button class="logout-button" onclick="logout()">Log Out</button>
+
+    </form>
+  </div>
+</main>
+
+  
+<script>
+
+  // Get the logged-in user's username from session storage
+const loggedInUser = sessionStorage.getItem("loggedInUser");
+
+// Get the logged-in user's data from local storage
+const userDataString = localStorage.getItem(loggedInUser);
+if (!userDataString) {
+  alert("User data not found. Please log in again.");
+  window.location.href = "login.html";
+}
+const userData = JSON.parse(userDataString);
+
+// Get the logged-in user's full name
+const fullNameElement = document.getElementById("full-name");
+const fullName = userData.fullname;
+
+// Set the full name in the "Welcome" section
+fullNameElement.textContent = `Welcome, ${fullName}!`;
+
+// Get other elements from the page
+const profilePicElement = document.getElementById("profile-pic");
+const nameInputElement = document.getElementById("name-input");
+const rankInputElement = document.getElementById("rank-input");
+const pokemonsInputElement = document.getElementById("pokemons-input");
+const battlesInputElement = document.getElementById("battles-input");
+
+// Set initial values
+let name = fullName;
+let rank = "Champion";
+let pokemonsCaught = 0;
+let battlesWon = 0;
+
+// Load saved data from local storage
+if (userData.userProfile && userData.userProfile.name) {
+  name = userData.userProfile.name;
+}
+if (userData.userProfile && userData.userProfile.rank) {
+  rank = userData.userProfile.rank;
+}
+if (userData.userProfile && userData.userProfile.pokemonsCaught) {
+  pokemonsCaught = parseInt(userData.userProfile.pokemonsCaught);
+}
+if (userData.userProfile && userData.userProfile.battlesWon) {
+  battlesWon = parseInt(userData.userProfile.battlesWon);
+}
+
+// Update the initial values
+fullNameElement.textContent = name;
+profilePicElement.setAttribute("src", "images/default.png"); // Replace with actual image URL
+nameInputElement.value = name;
+rankInputElement.value = rank;
+pokemonsInputElement.value = pokemonsCaught;
+battlesInputElement.value = battlesWon;
+
+// Toggle between edit mode and view mode
+const editButtons = document.querySelectorAll("[id^='edit-']"); // get all edit buttons
+const saveButton = document.getElementById("save-button");
+const cancelButton = document.getElementById("cancel-button");
+
+editButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    const inputId = button.previousElementSibling.getAttribute("id");
+    const inputElement = document.getElementById(inputId);
+    inputElement.disabled = false;
+    button.style.display = "none";
+    saveButton.style.display = "block";
+    cancelButton.style.display = "block";
+  });
+});
+
+cancelButton.addEventListener("click", () => {
+  nameInputElement.value = name;
+  rankInputElement.value = rank;
+  pokemonsInputElement.value = pokemonsCaught;
+  battlesInputElement.value = battlesWon;
+  nameInputElement.disabled = true;
+  rankInputElement.disabled = true;
+  pokemonsInputElement.disabled = true;
+  battlesInputElement.disabled = true;
+  editButtons.forEach(button => {
+    button.style.display = "block";
+  });
+  saveButton.style.display = "none";
+  cancelButton.style.display = "none";
+});
+
+saveButton.addEventListener("click", () => {
+  const userProfile = {
+    name: nameInputElement.value,
+    rank: rankInputElement.value,
+    pokemonsCaught: pokemonsInputElement.value,
+    battlesWon: battlesInputElement.value,
+  };
+  userData.userProfile = userProfile;
+  localStorage.setItem(loggedInUser, JSON.stringify(userData));
+  alert("Changes saved successfully!");
+  name = nameInputElement.value;
+  rank = rankInputElement.value;
+  pokemonsCaught = parseInt(pokemonsInputElement.value);
+  battlesWon = parseInt(battlesInputElement.value);
+  nameInputElement.disabled = true;
+  rankInputElement.disabled = true;
+  pokemonsInputElement.disabled = true;
+  battlesInputElement.disabled = true;
+  editButtons.forEach(button => {
+    button.style.display = "block";
+  });
+  saveButton.style.display = "none";
+  cancelButton.style.display = "none";
+});
+
+  // Logout:
+
+  function logout() {
+  // Remove user data from storage
+  localStorage.removeItem("loggedInUser");
+  sessionStorage.removeItem("loggedInUser");
+
+  // Redirect user to login page
+  window.location.href = "login.html";
+}
+
+  // cancel
+  function cancelChanges() {
+  // Get the initial values from the user's data
+  const userDataString = localStorage.getItem(loggedInUser);
+  const userData = JSON.parse(userDataString);
+  const fullName = userData.fullname;
+
+  let name = fullName;
+  let rank = "Champion";
+  let pokemonsCaught = 0;
+  let battlesWon = 0;
+
+  if (userData.userProfile && userData.userProfile.name) {
+    name = userData.userProfile.name;
+  }
+  if (userData.userProfile && userData.userProfile.rank) {
+    rank = userData.userProfile.rank;
+  }
+  if (userData.userProfile && userData.userProfile.pokemonsCaught) {
+    pokemonsCaught = parseInt(userData.userProfile.pokemonsCaught);
+  }
+  if (userData.userProfile && userData.userProfile.battlesWon) {
+    battlesWon = parseInt(userData.userProfile.battlesWon);
+  }
+
+  // Reset the form values to the initial values
+  const fullNameElement = document.getElementById("full-name");
+  const profilePicElement = document.getElementById("profile-pic");
+  const nameInputElement = document.getElementById("name-input");
+  const rankInputElement = document.getElementById("rank-input");
+  const pokemonsInputElement = document.getElementById("pokemons-input");
+  const battlesInputElement = document.getElementById("battles-input");
+
+  fullNameElement.textContent = fullName;
+  profilePicElement.setAttribute("src", "images/default.png"); // Replace with actual image URL
+  nameInputElement.value = name;
+  rankInputElement.value = rank;
+  pokemonsInputElement.value = pokemonsCaught;
+  battlesInputElement.value = battlesWon;
+
+  // Disable the form inputs and hide the buttons
+  nameInputElement.disabled = true;
+  rankInputElement.disabled = true;
+  pokemonsInputElement.disabled = true;
+  battlesInputElement.disabled = true;
+
+  const editButtons = document.querySelectorAll("[id^='edit-']");
+  editButtons.forEach(button => {
+    button.style.display = "block";
+  });
+
+  const saveButton = document.getElementById("save-button");
+  const cancelButton = document.getElementById("cancel-button");
+  saveButton.style.display = "none";
+  cancelButton.style.display = "none";
+}
+
+  // Get the Save Changes button element
+var saveChangesBtn = document.getElementById("save-button");
+
+// Add a click event listener to the Save Changes button
+saveChangesBtn.addEventListener("click", function() {
+  // Reload the current page
+  location.reload();
+});
+
+
+</script>
+
+  
+</body>
+</html>

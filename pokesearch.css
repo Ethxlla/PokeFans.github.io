@@ -1,0 +1,150 @@
+body {
+  position: relative;
+  height: 100vh;
+  background-image: url('images/PSBG.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.5); /* 50% white */
+  backdrop-filter: blur(10px); /* add a 10px blur effect */
+  z-index: -1;
+}
+
+/* THE CODE TO ALIGN LOGO TO THE LEFT AND BUTTONS TO THE RIGHT */
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.button-container {
+  display: flex;
+}
+
+button {
+  border-radius: 50%;
+  background-color: linear-gradient(to bottom right, white);
+  font-variant: small-caps;
+  font-style: oblique;
+  font-size: 1em;
+  padding: 8px;
+  box-shadow: -11px 9px 5px -4px rgba(0,0,0,0.31);
+  border: 4px solid red;
+  float: right;
+  margin: 10px;
+}
+
+button:hover {
+  background-color: lightgray;
+}
+
+
+/* search container */
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/*  label */
+.search-container label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+/* input */
+.search-container input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 16px;
+  color: #050505;
+}
+
+/* button */
+.search-container button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #030202;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Hover style for the button */
+.search-container button:hover {
+  background-color: #fa0000;
+}
+
+
+.Links {
+  color: lightcoral; /* changes text color to blue */
+  font-weight: bolder; /* makes text bold */
+  font-size: 18px; /* changes font size to 18 pixels */
+}
+
+.result-container {
+  margin: 0 auto;
+  width: 80%;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.result-container h2 {
+  font-family: Papyrus, sans-serif;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#pokemon-image {
+  cursor: pointer;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+  width:30%;
+}
+
+#pokemon-image.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+p {
+  font-weight: 800; 
+  text-transform: uppercase;
+  font-family: 'Bahnschrift', sans-serif; 
+  text-align: center; 
+  margin: 0;
+  padding-top: 10px;
+  
+}
+
+@media screen and (max-width: 768px) {
+	header {
+		font-size: 16px;
+	}
+}
